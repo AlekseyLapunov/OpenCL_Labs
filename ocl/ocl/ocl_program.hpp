@@ -11,20 +11,35 @@ namespace ocl {
         static std::string source;
         static std::string sourceFileName;
 
-        void printSource() {
-            if (source.empty())
-                return;
+        bool checkInit(const std::string& callerInfo = "Program") {
+            if (program == nullptr) {
+                ocl::log::stream() << OCL_MAKE_YELLOW(callerInfo) << ": Program should be initialized first\n";
+                return false;
+            }
 
-            OCL_LOG_DEFAULT << "Printing OpenCL source code next lines:\n";
-            ocl::log::stream() << OCL_MAKE_YELLOW(ocl::utils::fillerWithFileName(sourceFileName));
-            ocl::log::stream() << OCL_MAKE_CYAN(source);
-            ocl::log::stream() << OCL_MAKE_YELLOW(ocl::utils::filler());
+            return true;
+        }
 
+        bool cleanup() {
+            if (!checkInit())
+                return true;
+
+            cl_int err = clReleaseProgram(program);
+            if (err != CL_SUCCESS) {
+                OCL_LOG_ERROR << "Call to clReleaseProgram() has failed (err=" << err << ")\n";
+                return false;
+            }
+            OCL_LOG_POSITIVE << "Program released successfully\n";
+
+            return true;
         }
 
         bool init(const std::string& programSource) {
             if (!context::checkInit(__FUNCTION__))
                 return false;
+
+            if (program != nullptr)
+                cleanup();
 
             cl_int err;
             source = programSource;
@@ -47,27 +62,14 @@ namespace ocl {
             return true;
         }
 
-        bool checkInit(const std::string& callerInfo = "Program") {
-            if (program == nullptr) {
-                ocl::log::stream() << OCL_MAKE_YELLOW(callerInfo) << ": Program should be initialized first\n";
-                return false;
-            }
+        void printSource() {
+            if (source.empty())
+                return;
 
-            return true;
-        }
-
-        bool cleanup() {
-            if (!checkInit())
-                return true;
-
-            cl_int err = clReleaseProgram(program);
-            if (err != CL_SUCCESS) {
-                OCL_LOG_ERROR << "Call to clReleaseProgram() has failed (err=" << err << ")\n";
-                return false;
-            }
-            OCL_LOG_POSITIVE << "Program released successfully\n";
-
-            return true;
+            OCL_LOG_DEFAULT << "Printing OpenCL source code next lines:\n";
+            ocl::log::stream() << OCL_MAKE_YELLOW(ocl::utils::fillerWithFileName(sourceFileName));
+            ocl::log::stream() << OCL_MAKE_CYAN(source);
+            ocl::log::stream() << OCL_MAKE_YELLOW(ocl::utils::filler());
         }
 
     } // namespace program

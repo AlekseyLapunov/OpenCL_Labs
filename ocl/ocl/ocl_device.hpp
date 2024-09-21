@@ -10,6 +10,36 @@ namespace ocl {
         static cl_uint num;
         static cl_device_id* devices;
 
+        bool checkInit(const std::string& callerInfo = "Device") {
+            if (devices == nullptr) {
+                ocl::log::stream() << OCL_MAKE_YELLOW(callerInfo) << ": Device should be initialized first\n";
+                return false;
+            }
+
+            return true;
+        }
+
+        bool cleanup() {
+            if (!checkInit())
+                return true;
+
+            if (devices != nullptr) {
+                try {
+                    delete[] devices;
+                    OCL_LOG_POSITIVE << "Devices released successfully\n";
+                }
+                catch (std::exception& e) {
+                    OCL_LOG_ERROR << "Trouble releasing devices (" << e.what() << ")\n";
+                    return false;
+                }
+                devices = nullptr;
+            }
+            else
+                return true;
+
+            return true;
+        }
+
         bool init() {
             if (!platform::checkInit(__FUNCTION__)) {
                 return false;
@@ -22,25 +52,14 @@ namespace ocl {
             }
             OCL_LOG_POSITIVE << "Detected " << num << " OpenCL devices on the first platform\n";
 
-            if (devices != nullptr) {
-                delete[] devices;
-                devices = nullptr;
-            }
+            if (devices != nullptr)
+                cleanup();
 
             devices = new cl_device_id[num];
 
             err = clGetDeviceIDs(platform::platforms[0], CL_DEVICE_TYPE_ALL, num, devices, 0);
             if (err != CL_SUCCESS) {
                 OCL_LOG_ERROR << "clGetDeviceIDs returned an error (err=" << err << ")\n";
-                return false;
-            }
-
-            return true;
-        }
-
-        bool checkInit(const std::string& callerInfo = "Device") {
-            if (devices == nullptr) {
-                ocl::log::stream() << OCL_MAKE_YELLOW(__FUNCTION__) << ": Device should be initialized first\n";
                 return false;
             }
 
@@ -85,27 +104,6 @@ namespace ocl {
                 if (i != num - 1)
                     ocl::log::stream() << "\n";
             }
-        }
-
-        bool cleanup() {
-            if (!checkInit())
-                return true;
-
-            if (devices != nullptr) {
-                try {
-                    delete[] devices;
-                    OCL_LOG_POSITIVE << "Devices released successfully\n";
-                }
-                catch (std::exception& e) {
-                    OCL_LOG_ERROR << "Trouble releasing devices (" << e.what() << ")\n";
-                    return false;
-                }
-                devices = nullptr;
-            }
-            else
-                return true;
-
-            return true;
         }
 
     } // namespace device

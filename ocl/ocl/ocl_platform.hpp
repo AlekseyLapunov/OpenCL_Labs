@@ -9,6 +9,36 @@ namespace ocl {
         static cl_uint num;
         static cl_platform_id* platforms;
 
+        bool checkInit(const std::string& callerInfo = "Platform") {
+            if (platforms == nullptr) {
+                log::stream() << OCL_MAKE_YELLOW(callerInfo) << ": Platform should be initialized first\n";
+                return false;
+            }
+
+            return true;
+        }
+
+        bool cleanup() {
+            if (!checkInit())
+                return true;
+
+            if (platforms != nullptr) {
+                try {
+                    delete[] platforms;
+                    OCL_LOG_POSITIVE << "Platforms released successfully\n";
+                }
+                catch (std::exception& e) {
+                    OCL_LOG_ERROR << "Trouble releasing platforms (" << e.what() << ")\n";
+                    return false;
+                }
+                platforms = nullptr;
+            }
+            else
+                return true;
+
+            return true;
+        }
+
         bool init() {
             cl_int err = clGetPlatformIDs(0, 0, &num);
             if (err != CL_SUCCESS || num == 0) {
@@ -17,25 +47,14 @@ namespace ocl {
             }
             OCL_LOG_POSITIVE << "Detected " << num << " OpenCL platforms\n";
 
-            if (platforms != nullptr) {
-                delete[] platforms;
-                platforms = nullptr;
-            }
+            if (platforms != nullptr)
+                cleanup();
 
             platforms = new cl_platform_id[num];
 
             err = clGetPlatformIDs(num, platforms, 0);
             if (err != CL_SUCCESS) {
                 OCL_LOG_ERROR << "clGetPlatformIDs returned an error (err=" << err << ")\n";
-                return false;
-            }
-
-            return true;
-        }
-
-        bool checkInit(const std::string& callerInfo = "Platform") {
-            if (platforms == nullptr) {
-                log::stream() << OCL_MAKE_YELLOW(callerInfo) << ": Platform should be initialized first\n";
                 return false;
             }
 
@@ -75,27 +94,6 @@ namespace ocl {
                 if (i != num - 1)
                     ocl::log::stream() << "\n";
             }
-        }
-
-        bool cleanup() {
-            if (!checkInit())
-                return true;
-
-            if (platforms != nullptr) {
-                try {
-                    delete[] platforms;
-                    OCL_LOG_POSITIVE << "Platforms released successfully\n";
-                }
-                catch (std::exception& e) {
-                    OCL_LOG_ERROR << "Trouble releasing platforms (" << e.what() << ")\n";
-                    return false;
-                }
-                platforms = nullptr;
-            }
-            else
-                return true;
-
-            return true;
         }
 
     } // namespace platform

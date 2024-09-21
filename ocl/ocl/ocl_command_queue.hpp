@@ -9,21 +9,6 @@ namespace ocl {
 
         static cl_command_queue queue;
 
-        bool init() {
-            if (!context::checkInit(__FUNCTION__))
-                return false;
-
-            cl_int err;
-            queue = clCreateCommandQueue(context::context, device::devices[0], 0, &err);
-            if (err != CL_SUCCESS) {
-                OCL_LOG_ERROR << "Creating of queue has failed (err=" << err << ")\n";
-                return false;
-            }
-            OCL_LOG_POSITIVE << "Queue created successfully on the first device\n";
-
-            return true;
-        }
-
         bool checkInit(const std::string& callerInfo = "Command Queue") {
             if (queue == nullptr) {
                 ocl::log::stream() << OCL_MAKE_YELLOW(callerInfo) << ": Command Queue should be initialized first\n";
@@ -43,6 +28,24 @@ namespace ocl {
                 return false;
             }
             OCL_LOG_POSITIVE << "Command Queue released successfully\n";
+
+            return true;
+        }
+
+        bool init() {
+            if (!context::checkInit(__FUNCTION__))
+                return false;
+
+            if (queue != nullptr)
+                cleanup();
+
+            cl_int err;
+            queue = clCreateCommandQueue(context::context, device::devices[0], 0, &err);
+            if (err != CL_SUCCESS) {
+                OCL_LOG_ERROR << "Creating of queue has failed (err=" << err << ")\n";
+                return false;
+            }
+            OCL_LOG_POSITIVE << "Queue created successfully on the first device\n";
 
             return true;
         }

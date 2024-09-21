@@ -12,9 +12,35 @@ namespace ocl {
         static cl_kernel kernel;
         static cl_uint argCount = 0;
 
+        bool checkInit(const std::string& callerInfo = "Kernel") {
+            if (kernel == nullptr) {
+                ocl::log::stream() << OCL_MAKE_YELLOW(callerInfo) << ": Kernel should be initialized first\n";
+                return false;
+            }
+
+            return true;
+        }
+
+        bool cleanup() {
+            if (!checkInit())
+                return true;
+
+            cl_int err = clReleaseKernel(kernel);
+            if (err != CL_SUCCESS) {
+                OCL_LOG_ERROR << "Call to clReleaseKernel() has failed (err=" << err << ")\n";
+                return false;
+            }
+            OCL_LOG_POSITIVE << "Kernel released successfully\n";
+
+            return true;
+        }
+
         bool init(const std::string& kernelFunctionName) {
             if (!program::checkInit(__FUNCTION__))
                 return false;
+
+            if (kernel != nullptr)
+                cleanup();
 
             cl_int err;
             const char* functionNameArg = kernelFunctionName.c_str();
@@ -26,15 +52,6 @@ namespace ocl {
             OCL_LOG_POSITIVE << "Kernel created successfully\n";
 
             argCount = 0;
-            return true;
-        }
-
-        bool checkInit(const std::string& callerInfo = "Kernel") {
-            if (kernel == nullptr) {
-                ocl::log::stream() << OCL_MAKE_YELLOW(callerInfo) << ": Kernel should be initialized first\n";
-                return false;
-            }
-
             return true;
         }
         
@@ -88,20 +105,6 @@ namespace ocl {
                 return;
             }
             OCL_LOG_POSITIVE << "Recommended common multiple of working elements inside one work group: " << arg << "\n";
-        }
-
-        bool cleanup() {
-            if (!checkInit())
-                return true;
-
-            cl_int err = clReleaseKernel(kernel);
-            if (err != CL_SUCCESS) {
-                OCL_LOG_ERROR << "Call to clReleaseKernel() has failed (err=" << err << ")\n";
-                return false;
-            }
-            OCL_LOG_POSITIVE << "Kernel released successfully\n";
-
-            return true;
         }
 
     } // namespace kernel
