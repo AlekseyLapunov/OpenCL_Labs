@@ -9,23 +9,18 @@ namespace ocl {
 
         static cl_uint num;
         static cl_device_id* devices;
-        static bool isInit = false;
 
-        bool init(std::ostream& log) {
-            isInit = false;
-
-            if (!platform::checkInit(log, __FUNCTION__)) {
+        bool init() {
+            if (!platform::checkInit(__FUNCTION__)) {
                 return false;
             }
 
             cl_int err = clGetDeviceIDs(platform::platforms[0], CL_DEVICE_TYPE_ALL, 0, 0, &num);
-            if (err == CL_SUCCESS && num != 0) {
-                log << MAKE_GREEN(__FUNCTION__) << ": Detected " << num << " OpenCL devices on the first platform\n";
-            }
-            else {
-                log << MAKE_RED(__FUNCTION__) << ": OpenCL devices are not detected (err=" << err << ")\n";
+            if (err != CL_SUCCESS || num == 0) {
+                OCL_LOG_ERROR << "OpenCL devices are not detected (err=" << err << ")\n";
                 return false;
             }
+            OCL_LOG_POSITIVE << "Detected " << num << " OpenCL devices on the first platform\n";
 
             if (devices != nullptr) {
                 delete[] devices;
@@ -36,74 +31,73 @@ namespace ocl {
 
             err = clGetDeviceIDs(platform::platforms[0], CL_DEVICE_TYPE_ALL, num, devices, 0);
             if (err != CL_SUCCESS) {
-                log << MAKE_RED(__FUNCTION__) << ": clGetDeviceIDs returned an error (err=" << err << ")\n";
-                return false;
-            }
-
-            isInit = true;
-            return true;
-        }
-
-        bool checkInit(std::ostream& log, const std::string& callerInfo = "Device") {
-            if (!isInit || devices == nullptr) {
-                log << MAKE_YELLOW(__FUNCTION__) << ": Device should be initialized first\n";
+                OCL_LOG_ERROR << "clGetDeviceIDs returned an error (err=" << err << ")\n";
                 return false;
             }
 
             return true;
         }
 
-        void printInfo(std::ostream& log) {
-            if (!platform::checkInit(log, __FUNCTION__))
+        bool checkInit(const std::string& callerInfo = "Device") {
+            if (devices == nullptr) {
+                ocl::log::stream() << OCL_MAKE_YELLOW(__FUNCTION__) << ": Device should be initialized first\n";
+                return false;
+            }
+
+            return true;
+        }
+
+        void printInfo() {
+            if (!platform::checkInit(__FUNCTION__))
                 return;
 
             if (platform::num == 0) {
-                log << MAKE_RED(__FUNCTION__) << ": Print failed because of 0 platforms.\n";
+                OCL_LOG_ERROR << "Print failed because of 0 platforms.\n";
                 return;
             }
 
-            log << MAKE_GREEN(__FUNCTION__) << ": Printing information about " << num << " devices:\n";
+            OCL_LOG_DEFAULT << "Printing information about " << num << " devices:\n";
             cl_uint arg;
             const int strbufSize = 250;
             char strbuf[strbufSize];
 
             cl_device_id* dPtr = devices;
             if (dPtr == nullptr) {
-                log << MAKE_RED(__FUNCTION__) << ": Print failed because devices pointer was nullptr\n";
+                OCL_LOG_ERROR << "Print failed because devices pointer was nullptr\n";
                 return;
             }
 
-            auto printStrLambda = [&dPtr, &strbuf, strbufSize, &log](int dId, cl_uint cl_parameter, const std::string& name) {
+            auto printStrLambda = [&dPtr, &strbuf, strbufSize](int dId, cl_uint cl_parameter, const std::string& name) {
                 clGetDeviceInfo(devices[dId], cl_parameter, strbufSize, (void*)strbuf, 0);
-                log << "\t" << MAKE_YELLOW(name) << ":" << utils::getTab(name.size()) << strbuf << "\n";
+                ocl::log::stream() << "\t" << OCL_MAKE_YELLOW(name) << ":" << utils::getTab(name.size()) << strbuf << "\n";
             };
-            auto printArgLambda = [&dPtr, arg, &log](int dId, cl_uint cl_parameter, const std::string& name) {
+            auto printArgLambda = [&dPtr, arg](int dId, cl_uint cl_parameter, const std::string& name) {
                 clGetDeviceInfo(devices[dId], cl_parameter, sizeof(arg), (void*)&arg, 0);
-                log << "\t" << MAKE_YELLOW(name) << ":" << utils::getTab(name.size()) << arg << "\n";
+                ocl::log::stream() << "\t" << OCL_MAKE_YELLOW(name) << ":" << utils::getTab(name.size()) << arg << "\n";
             };
 
             for (unsigned int i = 0; i < num; i++) {
-                log << "D#" << i + 1 << " ";
+                ocl::log::stream() << "D#" << i + 1 << " ";
                 printStrLambda(i, CL_DEVICE_NAME,                   "NAME");
                 printStrLambda(i, CL_DEVICE_OPENCL_C_VERSION,       "OPENCL_VERSION");
                 printArgLambda(i, CL_DEVICE_MAX_CLOCK_FREQUENCY,    "MAX_CLOCK_FREQUENCY");
                 printArgLambda(i, CL_DEVICE_MAX_COMPUTE_UNITS,      "MAX_COMPUTE_UNITS");
                 if (i != num - 1)
-                    log << "\n";
+                    ocl::log::stream() << "\n";
             }
         }
 
-        bool cleanup(std::ostream& log) {
-            if (!isInit)
+        bool cleanup() {
+            if (!checkInit())
                 return true;
 
             if (devices != nullptr) {
                 try {
                     delete[] devices;
-                    log << MAKE_GREEN(__FUNCTION__) << ": devices released successfully\n";
+                    OCL_LOG_POSITIVE << "Devices released successfully\n";
                 }
                 catch (std::exception& e) {
-                    log << MAKE_RED(__FUNCTION__) << ": trouble releasing devices (" << e.what() << ")\n";
+                    OCL_LOG_ERROR << "Trouble releasing devices (" << e.what() << ")\n";
                     return false;
                 }
                 devices = nullptr;

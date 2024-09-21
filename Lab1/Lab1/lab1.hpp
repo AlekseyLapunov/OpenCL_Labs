@@ -6,6 +6,7 @@ class Lab1 {
 public:
     Lab1(const std::string& kernelCodeFileName, const std::string& kernelFunctionName) {
         ocl::init(kernelCodeFileName, kernelFunctionName);
+        ocl::log::setLogStream(std::cout);
     }
     ~Lab1() {
         ocl::cleanup();
