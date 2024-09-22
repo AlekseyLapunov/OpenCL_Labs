@@ -7,15 +7,17 @@
 
 #include <CL/cl.h>
 
-#define OCL_MAKE_RED(input)     ("\033[91m" + std::string(input) + "\033[0m")
-#define OCL_MAKE_YELLOW(input)  ("\033[93m" + std::string(input) + "\033[0m")
-#define OCL_MAKE_GREEN(input)   ("\033[92m" + std::string(input) + "\033[0m")
-#define OCL_MAKE_CYAN(input)    ("\033[96m" + std::string(input) + "\033[0m")
+#define OCL_MAKE_RED(input)      ("\033[91m" + std::string(input) + "\033[0m")
+#define OCL_MAKE_YELLOW(input)   ("\033[93m" + std::string(input) + "\033[0m")
+#define OCL_MAKE_GREEN(input)    ("\033[92m" + std::string(input) + "\033[0m")
+#define OCL_MAKE_CYAN(input)     ("\033[96m" + std::string(input) + "\033[0m")
 
-#define OCL_LOG_ERROR           ocl::log::stream() << OCL_MAKE_RED(__FUNCTION__)    << ":\t"
-#define OCL_LOG_WARNING         ocl::log::stream() << OCL_MAKE_YELLOW(__FUNCTION__) << ":\t"
-#define OCL_LOG_POSITIVE        ocl::log::stream() << OCL_MAKE_GREEN(__FUNCTION__)  << ":\t"
-#define OCL_LOG_DEFAULT         ocl::log::stream() << OCL_MAKE_CYAN(__FUNCTION__)   << ":\t"
+#define OCL_LOG_ERROR            ocl::log::stream() << OCL_MAKE_RED(__FUNCTION__)    << ":\t"
+#define OCL_LOG_WARNING          ocl::log::stream() << OCL_MAKE_YELLOW(__FUNCTION__) << ":\t"
+#define OCL_LOG_POSITIVE         ocl::log::stream() << OCL_MAKE_GREEN(__FUNCTION__)  << ":\t"
+#define OCL_LOG_DEFAULT          ocl::log::stream() << OCL_MAKE_CYAN(__FUNCTION__)   << ":\t"
+
+#define OCL_INIT_WARNING(caller) ocl::log::stream() << OCL_MAKE_YELLOW(caller) << ":\t"
 
 namespace ocl {
 

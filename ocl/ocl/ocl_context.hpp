@@ -12,7 +12,7 @@ namespace ocl {
 
         bool checkInit(const std::string& callerInfo = "Context") {
             if (context == nullptr) {
-                ocl::log::stream() << OCL_MAKE_YELLOW(callerInfo) << ": Context should be initialized first\n";
+                OCL_INIT_WARNING(callerInfo) << "Context should be initialized first\n";
                 return false;
             }
 

@@ -12,7 +12,7 @@ namespace ocl {
 
         bool checkInit(const std::string& callerInfo = "Device") {
             if (devices == nullptr) {
-                ocl::log::stream() << OCL_MAKE_YELLOW(callerInfo) << ": Device should be initialized first\n";
+                OCL_INIT_WARNING(callerInfo) << "Device should be initialized first\n";
                 return false;
             }
 

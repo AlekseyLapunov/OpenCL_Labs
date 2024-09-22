@@ -11,7 +11,7 @@ namespace ocl {
 
         bool checkInit(const std::string& callerInfo = "Platform") {
             if (platforms == nullptr) {
-                log::stream() << OCL_MAKE_YELLOW(callerInfo) << ": Platform should be initialized first\n";
+                OCL_INIT_WARNING(callerInfo) << "Platform should be initialized first\n";
                 return false;
             }
 

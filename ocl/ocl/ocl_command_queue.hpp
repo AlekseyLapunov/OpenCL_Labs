@@ -11,7 +11,7 @@ namespace ocl {
 
         bool checkInit(const std::string& callerInfo = "Command Queue") {
             if (queue == nullptr) {
-                ocl::log::stream() << OCL_MAKE_YELLOW(callerInfo) << ": Command Queue should be initialized first\n";
+                OCL_INIT_WARNING(callerInfo) << "Command Queue should be initialized first\n";
                 return false;
             }
 

@@ -14,7 +14,7 @@ namespace ocl {
 
         bool checkInit(const std::string& callerInfo = "Kernel") {
             if (kernel == nullptr) {
-                ocl::log::stream() << OCL_MAKE_YELLOW(callerInfo) << ": Kernel should be initialized first\n";
+                OCL_INIT_WARNING(callerInfo) << "Kernel should be initialized first\n";
                 return false;
             }
 

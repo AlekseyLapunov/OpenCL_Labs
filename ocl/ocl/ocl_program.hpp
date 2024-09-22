@@ -13,7 +13,7 @@ namespace ocl {
 
         bool checkInit(const std::string& callerInfo = "Program") {
             if (program == nullptr) {
-                ocl::log::stream() << OCL_MAKE_YELLOW(callerInfo) << ": Program should be initialized first\n";
+                OCL_INIT_WARNING(callerInfo) << "Program should be initialized first\n";
                 return false;
             }
 
