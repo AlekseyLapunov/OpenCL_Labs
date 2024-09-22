@@ -35,6 +35,9 @@ namespace ocl {
 
     namespace utils {
 
+        static size_t fillerLength = 80;
+        static char   fillerSign   = '-';
+
         std::string getTab(size_t size) {
             if (size <= 6)
                 return "\t\t\t";
@@ -78,7 +81,7 @@ namespace ocl {
             return output;
         }
 
-        std::string filler(size_t length = 60, char sign = '=') {
+        std::string filler(size_t length = fillerLength, char sign = fillerSign) {
             std::string output;
             output.resize(length + 1);
             for (size_t i = 0; i < length; i++)
@@ -87,7 +90,7 @@ namespace ocl {
             return output;
         }
 
-        std::string fillerWithFileName(const std::string& fileName = "file", size_t length = 60, char sign = '=') {
+        std::string fillerWithFileName(const std::string& fileName = "file", size_t length = fillerLength, char sign = fillerSign) {
             if (fileName.size() > length)
                 return fileName;
 
@@ -97,12 +100,12 @@ namespace ocl {
             std::string output;
             output.resize(length + 1);
             size_t sideLen = (length - fileName.size()) / 2;
-            for (size_t left = 0; left < sideLen - 1; left++)
+            for (size_t left = 0; left < sideLen - 2; left++)
                 output += sign;
-            output += ' ';
+            output += "[ ";
             output += fileName;
-            output += ' ';
-            for (size_t right = 0; right < sideLen - 1; right++)
+            output += " ]";
+            for (size_t right = 0; right < sideLen - 2; right++)
                 output += sign;
             output += '\n';
             return output;
