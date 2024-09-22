@@ -33,8 +33,9 @@ namespace ocl {
         ocl::kernel::emplaceArgumentArray((void*)&arr, sizeof(T), arrSize);
     }
 
-    bool executeKernel(cl_uint dim, size_t globalWorkSize[], bool autoSplit, size_t localWorkSize[],
-                       size_t resArgPos, void* resBuf) {
+    template <typename T>
+    bool executeKernel(cl_uint dim, const size_t globalWorkSize[], bool autoSplit, const size_t localWorkSize[],
+                       size_t resArgPos, T& resBuf) {
         if (!kernel::checkInit(__FUNCTION__))
             return false;
 
@@ -58,7 +59,7 @@ namespace ocl {
         }
         OCL_LOG_POSITIVE << "Kernel finished the calculations successfuly\n";
 
-        if (!memory::readByArgPos(resArgPos, resBuf)) {
+        if (!memory::readByArgPos(resArgPos, (void*)&resBuf)) {
             OCL_LOG_ERROR << "Failed to fetch result of kernel execution\n";
             return false;
         }

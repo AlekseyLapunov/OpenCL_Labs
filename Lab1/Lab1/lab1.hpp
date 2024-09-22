@@ -27,10 +27,10 @@ public:
         std::cout << "arr[] before kernel calculations:\t";
         printArray(arr, arrSize);
 
-        size_t globalWorkSize[] = { 4, 0, 0 };
-        size_t localWorkSize[] = { 0, 0, 0 };
+        const size_t globalWorkSize[] = { 4, 0, 0 };
+        const size_t localWorkSize[] = { 0, 0, 0 };
 
-        if (!ocl::executeKernel(1, globalWorkSize, true, localWorkSize, 0, (void*)&arr))
+        if (!ocl::executeKernel(1, globalWorkSize, true, localWorkSize, 0, arr))
             return;
 
         std::cout << "arr[] after kernel calculations:\t";
