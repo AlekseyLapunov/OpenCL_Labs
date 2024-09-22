@@ -95,7 +95,7 @@ namespace ocl {
                 OCL_LOG_ERROR << "Call to clGetKernelWorkGroupInfo() resulted in error (fetching CL_KERNEL_WORK_GROUP_SIZE) (err=" << err << ")\n";
                 return;
             }
-            OCL_LOG_POSITIVE << "Maximum count of working elements inside one work group : " << arg << "\n";
+            OCL_LOG_POSITIVE << "Maximum count of working elements inside one work group: " << arg << "\n";
 
             err = clGetKernelWorkGroupInfo(kernel::kernel, device::devices[0],
                 CL_KERNEL_PREFERRED_WORK_GROUP_SIZE_MULTIPLE,
