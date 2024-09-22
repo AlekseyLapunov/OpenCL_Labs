@@ -33,6 +33,46 @@ namespace ocl {
         ocl::kernel::emplaceArgumentArray((void*)&arr, sizeof(T), arrSize);
     }
 
+    KernelParameters& kernelPrompt(std::istream& ist = std::cin) {
+        ocl::log::stream() << "Enter working dimension >> ";
+        ist >> ocl::_kernelParameters.dimension;
+        ist.clear();
+
+        if (_kernelParameters.dimension == 0 || _kernelParameters.dimension > 3) {
+            ocl::log::stream() << "Wrong dimension value (1 <= dim <= 3), using dim=1.\n";
+            _kernelParameters.dimension = 1;
+        }
+
+        for (size_t i = 1; i <= _kernelParameters.dimension; i++) {
+            ocl::log::stream() << "Enter global work size (" << i << "/" << _kernelParameters.dimension << ") >> ";
+            ist >> _kernelParameters.gWorkSize[i - 1];
+            ist.clear();
+        }
+
+        char autoSplitChar = ' ';
+        ocl::log::stream() << "Use auto split? (y/n) >> ";
+        ist >> autoSplitChar;
+        if (autoSplitChar == 'y')
+            ocl::_kernelParameters.autoSplit = true;
+        else if (autoSplitChar == 'n')
+            ocl::_kernelParameters.autoSplit = false;
+        else {
+            ocl::log::stream() << "Unrecognized symbol, using auto split.\n";
+            ocl::_kernelParameters.autoSplit = true;
+        }
+
+        if (_kernelParameters.autoSplit)
+            return _kernelParameters;
+
+        for (size_t i = 1; i <= _kernelParameters.dimension; i++) {
+            ocl::log::stream() << "Enter local work size (" << i << "/" << _kernelParameters.dimension << ") >> ";
+            ist >> _kernelParameters.lWorkSize[i - 1];
+            ist.clear();
+        }
+
+        return _kernelParameters;
+    }
+
     template <typename T>
     bool executeKernel(cl_uint dim, const size_t globalWorkSize[], bool autoSplit, const size_t localWorkSize[],
                        size_t resArgPos, T& resBuf) {
@@ -67,6 +107,12 @@ namespace ocl {
             OCL_LOG_POSITIVE << "Result of kernel execution successfully fetched\n";
             return true;
         }
+    }
+
+    template <typename T>
+    bool promptExecuteKernel(size_t resArgPos, T& resBuf, std::istream& promptStream = std::cin) {
+        KernelParameters& kp = kernelPrompt(promptStream);
+        return executeKernel(kp.dimension, kp.gWorkSize, kp.autoSplit, kp.lWorkSize, resArgPos, resBuf);
     }
 
     void printVerboseInfo(uint8_t indent = 0) {

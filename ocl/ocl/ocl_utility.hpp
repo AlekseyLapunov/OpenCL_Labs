@@ -21,6 +21,13 @@
 
 namespace ocl {
 
+    struct KernelParameters {
+        cl_uint dimension    = 3;
+        size_t  gWorkSize[3] = { 1, 1, 1 };
+        size_t  lWorkSize[3] = { 1, 1, 1 };
+        bool    autoSplit    = false;
+    } static _kernelParameters;
+
     namespace log {
 
         static std::ostream* _stream = &std::cout;
