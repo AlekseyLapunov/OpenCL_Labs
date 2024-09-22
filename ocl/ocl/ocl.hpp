@@ -23,6 +23,16 @@ namespace ocl {
         return true;
     }
 
+    template <typename T>
+    void addArgument(T& arg) {
+        ocl::kernel::emplaceArgument((void*)&arg, sizeof(T));
+    }
+
+    template <typename T>
+    void addArgumentArray(T& arr, size_t arrSize) {
+        ocl::kernel::emplaceArgumentArray((void*)&arr, sizeof(T), arrSize);
+    }
+
     bool executeKernel(cl_uint dim, size_t globalWorkSize[], bool autoSplit, size_t localWorkSize[],
                        size_t resArgPos, void* resBuf) {
         if (!kernel::checkInit(__FUNCTION__))

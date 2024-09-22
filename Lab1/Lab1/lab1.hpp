@@ -15,11 +15,11 @@ public:
     void doTask() {
         ocl::printVerboseInfo(1);
 
-        const int arrSize = 5;                 // arg 1
-        int arr[arrSize] = { 3, 5, 7, 9, 11 }; // arg 0
+        const int arrSize = 5;                 // arg pos 1
+        int arr[arrSize] = { 3, 5, 7, 9, 11 }; // arg pos 0
 
-        ocl::kernel::emplaceArgumentArray((void*)&arr, sizeof(int), arrSize);
-        ocl::kernel::emplaceArgument((void*)&arrSize, sizeof(int));
+        ocl::addArgumentArray(arr, arrSize);   // arg pos 0
+        ocl::addArgument(arrSize);             // arg pos 1
 
         std::cout << "arr[] before kernel calculations:\t";
         printArray(arr, arrSize);
