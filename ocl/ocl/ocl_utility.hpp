@@ -7,10 +7,10 @@
 
 #include <CL/cl.h>
 
-#define OCL_MAKE_RED(input)      ("\033[91m" + std::string(input) + "\033[0m")
-#define OCL_MAKE_YELLOW(input)   ("\033[93m" + std::string(input) + "\033[0m")
-#define OCL_MAKE_GREEN(input)    ("\033[92m" + std::string(input) + "\033[0m")
-#define OCL_MAKE_CYAN(input)     ("\033[96m" + std::string(input) + "\033[0m")
+#define OCL_MAKE_RED(input)      ((ocl::log::color ? "\033[91m" : "") + std::string(input) + (ocl::log::color ? "\033[0m" : ""))
+#define OCL_MAKE_YELLOW(input)   ((ocl::log::color ? "\033[93m" : "") + std::string(input) + (ocl::log::color ? "\033[0m" : ""))
+#define OCL_MAKE_GREEN(input)    ((ocl::log::color ? "\033[92m" : "") + std::string(input) + (ocl::log::color ? "\033[0m" : ""))
+#define OCL_MAKE_CYAN(input)     ((ocl::log::color ? "\033[96m" : "") + std::string(input) + (ocl::log::color ? "\033[0m" : ""))
 
 #define OCL_LOG_ERROR            ocl::log::stream() << OCL_MAKE_RED(__FUNCTION__)    << ":\t"
 #define OCL_LOG_WARNING          ocl::log::stream() << OCL_MAKE_YELLOW(__FUNCTION__) << ":\t"
@@ -24,6 +24,7 @@ namespace ocl {
     namespace log {
 
         static std::ostream* _stream = &std::cout;
+        static bool color            = true;
 
         inline std::ostream& stream() {
             return *_stream;
@@ -31,6 +32,14 @@ namespace ocl {
 
         void setLogStream(std::ostream& log) {
             _stream = &log;
+        }
+
+        void disableColor() {
+            color = false;
+        }
+
+        void enableColor() {
+            color = true;
         }
 
     } // namespace log
