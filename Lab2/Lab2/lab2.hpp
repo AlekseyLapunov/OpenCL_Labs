@@ -54,7 +54,7 @@ public:
             delete[] numbersBuffer;
     }
 
-    void gpuSolve() {
+    void gpuSolve(size_t workers) {
         if (numbersBuffer != nullptr)
             delete[] numbersBuffer;
 
@@ -73,7 +73,7 @@ public:
 
         Timer t;
 
-        size_t gWorkSize[3] = { 512 };
+        size_t gWorkSize[3] = { workers };
         ocl::executeKernel(1, gWorkSize, true, nullptr, 3, *numbersBuffer);
         gpuSolveTimeMs = t.getMs();
 

@@ -11,7 +11,7 @@ int main(int argc, char* argv[]) {
     lab2.importFromFile("input.txt");
 
     lab2.cpuSolve();
-    lab2.gpuSolve();
+    lab2.gpuSolve(768);
     lab2.printResults();
 
     lab2.exportToFile("output.txt");
