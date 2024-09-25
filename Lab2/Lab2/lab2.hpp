@@ -5,6 +5,7 @@
 #include <cstdlib>
 #include <ctime>
 #include <fstream>
+#include <iostream>
 #include <sstream>
 #include <unordered_set>
 #include <vector>
@@ -214,6 +215,7 @@ public:
         res << "2. Printing time results:\n";
         res.precision(3);
         res << ocl::utils::filler(fillerSize, '=');
+        res << "Overall count of phone numbers:\t" << _problem.phoneNumbersCount << "\n";
         res << "CPU solving time:\t\t" << cpuSolveTimeMs << " ms\n";
         res << "GPU solving time:\t\t" << gpuSolveTimeMs << " ms\n";
         res.precision(2);
