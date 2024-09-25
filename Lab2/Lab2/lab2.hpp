@@ -73,7 +73,7 @@ public:
 
         Timer t;
 
-        size_t gWorkSize[3] = { 1024 };
+        size_t gWorkSize[3] = { 512 };
         ocl::executeKernel(1, gWorkSize, true, nullptr, 3, *numbersBuffer);
         gpuSolveTimeMs = t.getMs();
 
@@ -218,10 +218,10 @@ public:
         res << "GPU solving time:\t\t" << gpuSolveTimeMs << " ms\n";
         res.precision(2);
         res << ocl::utils::filler(fillerSize, '-');
-        if ((gpuSolveTimeMs >= cpuSolveTimeMs) && gpuSolveTimeMs != 0.0)
-            res << "CPU overwhelming percentage:\t" << gpuSolveTimeMs/cpuSolveTimeMs*100 << "%\n";
-        else if ((gpuSolveTimeMs < cpuSolveTimeMs) && cpuSolveTimeMs != 0.0)
-            res << "GPU overwhelming percentage:\t" << cpuSolveTimeMs/gpuSolveTimeMs*100 << "%\n";
+        if ((gpuSolveTimeMs >= cpuSolveTimeMs) && gpuSolveTimeMs != 0.0f)
+            res << OCL_MAKE_CYAN("CPU") << " overwhelming percentage:\t" << 100*(gpuSolveTimeMs/cpuSolveTimeMs - 1) << "%\n";
+        else if ((gpuSolveTimeMs < cpuSolveTimeMs) && cpuSolveTimeMs != 0.0f)
+            res << OCL_MAKE_GREEN("GPU") << " overwhelming percentage:\t" << 100*(cpuSolveTimeMs/gpuSolveTimeMs - 1) << "%\n";
         res << ocl::utils::filler(fillerSize, '=');
         res << "\n";
 
