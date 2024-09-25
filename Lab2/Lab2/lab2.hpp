@@ -32,8 +32,8 @@ private:
         std::chrono::duration<double, std::milli> duration;
     };
 
-    double cpuSolveTimeMs = 0.0;
-    double gpuSolveTimeMs = 0.0;
+    double cpuSolveTimeMs = 0.0f;
+    double gpuSolveTimeMs = 0.0f;
 
     char* numbersBuffer = nullptr;
     std::vector<std::string> gpuResults;
@@ -83,7 +83,7 @@ public:
     }
 
     void cpuSolve() {
-        std::vector<std::string> result;
+        validationSet.clear();
         Timer t;
 
         char kDigit = _problem.K + '0';
@@ -94,14 +94,11 @@ public:
                     count++;
             }
             if (count == _problem.N)
-                result.push_back(number);
+                validationSet.insert(number);
         }
 
         cpuSolveTimeMs = t.getMs();
         std::cout << __FUNCTION__ << " elapsed time: " << cpuSolveTimeMs << " ms \n";
-
-        for (const auto& res : result)
-            validationSet.insert(res);
     }
 
     void importFromFile(const std::string& fileName) {
@@ -201,16 +198,18 @@ public:
         const int fillerSize = 50;
         res.setf(std::ios::fixed);
         res.precision(2);
-        res << "\n";
+        res << '\n';
         res << ocl::utils::fillerWithFileName("Results", fillerSize, ':');
         res << "1. Printing validation results:\n";
         res << ocl::utils::filler(fillerSize, '=');
         res << "CPU results count: " << validationSet.size() << "\n";
         res << "GPU results count: " << gpuResults.size() << "\n";
         res << ocl::utils::filler(fillerSize, '-');
-        res << "Results equality percent: " << equalityPercent << "%\n";
+        res << "Results equality percent: " << equalityPercent << "% ";
+        res << ((equalityPercent == 100.0f) ? OCL_MAKE_GREEN("RESULTS VALID") : OCL_MAKE_RED("RESULTS NOT VALID"));
+        res << '\n';
         res << ocl::utils::filler(fillerSize, '=');
-        res << "\n";
+        res << '\n';
 
         res << "2. Printing time results:\n";
         res.precision(3);
@@ -225,6 +224,7 @@ public:
             res << "GPU overwhelming percentage:\t" << cpuSolveTimeMs/gpuSolveTimeMs*100 << "%\n";
         res << ocl::utils::filler(fillerSize, '=');
         res << "\n";
+
         std::cout << res.str();
     }
 
