@@ -24,6 +24,7 @@ __kernel void solve(__global const int* N,
 		end = begin + last;
 
 	__local int oddNumbers;
+	barrier(CLK_LOCAL_MEM_FENCE);
 
 	char kChar = (char)(*K) + '0';
 	for (int i = begin; i < end; i++) {
