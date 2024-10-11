@@ -102,8 +102,11 @@ public:
             validationSet.insert(number);
 
             int sum = 0;
-            for (const auto& digit : number)
+            for (const auto& digit : number) {
+                if (digit == '+')
+                    continue;
                 sum += (digit - '0');
+            }
 
             if (sum % 2 != 0)
                 oddNumbers++;

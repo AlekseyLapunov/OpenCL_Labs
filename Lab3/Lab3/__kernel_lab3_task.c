@@ -39,7 +39,7 @@ __kernel void solve(__global const int* N,
 		}
 
 		int sum = 0;
-		for (int j = i * 12; j < 12 * (i + 1); j++) {
+		for (int j = i * 12 + 1; j < 12 * (i + 1); j++) {
 			sum += (numbers[j] - '0');
 		}
 
