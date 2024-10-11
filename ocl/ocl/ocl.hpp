@@ -84,13 +84,13 @@ namespace ocl {
             return false;
         }
 
+        OCL_LOG_POSITIVE << "Starting kernel for execution\n";
         cl_int err = clEnqueueNDRangeKernel(command_queue::queue, kernel::kernel,
             dim, NULL, globalWorkSize, (autoSplit ? NULL : localWorkSize), 0, 0, 0);
         if (err != CL_SUCCESS) {
             OCL_LOG_ERROR << "Error starting the kernel (err=" << err << ")\n";
             return false;
         }
-        OCL_LOG_POSITIVE << "Kernel started for execution\n";
 
         err = clFinish(command_queue::queue);
         if (err != CL_SUCCESS) {
